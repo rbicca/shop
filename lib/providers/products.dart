@@ -38,9 +38,18 @@ class Products with ChangeNotifier {
     ),
   ];
 
+  //var _showFavoritesOnly = false;
 
   List<Product> get items {
-    return [..._items];
+    //if(_showFavoritesOnly){
+    //  return _items.where((p) => p.isFavorite).toList();
+    //} else {
+      return [..._items];
+    //}
+  }
+
+  List<Product> get favoriteItems{
+    return _items.where((p) => p.isFavorite == true).toList();
   }
 
   Product findById(String id){
@@ -51,4 +60,16 @@ class Products with ChangeNotifier {
     _items.add(value);
     notifyListeners();
   }
+
+  // void showFavoritesOnly(){
+  //   _showFavoritesOnly = true;
+  //   notifyListeners();
+  // }
+
+  // void showAll(){
+  //   _showFavoritesOnly = false;
+  //   notifyListeners();
+  // }
+
+
 }
