@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop/providers/products.dart';
+import 'package:shop/providers/cart.dart';
+import 'package:shop/screens/cart.dart';
+import 'package:shop/widgets/badge.dart';
 
 import 'package:shop/widgets/products_grid.dart';
 
@@ -19,8 +21,6 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
-
     //final productsData = Provider.of<Products>(context, listen: false);
 
     return Scaffold(
@@ -32,12 +32,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
               setState(() {
                 if (value == FilterOptions.Favorites) {
                   _showOnlyFavorites = true;
-                  
                 } else {
                   _showOnlyFavorites = false;
                 }
               });
-              print('showFavs = ${_showOnlyFavorites}');
+              print('showFavs = $_showOnlyFavorites');
             },
             icon: Icon(
               Icons.more_vert,
@@ -52,7 +51,16 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                 value: FilterOptions.All,
               ),
             ],
-          )
+          ),
+          Consumer<Cart>(
+            builder: (_, cart, childDontChange) => Badge(
+              child: childDontChange,
+              value: cart.itemCount.toString(),
+            ),
+            child: IconButton(icon: Icon(Icons.shopping_cart), onPressed: () {
+              Navigator.of(context).pushNamed(CartScreen.routeName);
+            },),
+          ),
         ],
       ),
       body: ProductsGrid(_showOnlyFavorites),

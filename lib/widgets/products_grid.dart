@@ -11,7 +11,7 @@ class ProductsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('showFavs compo = ${showFavs}');
+    print('showFavs compo = $showFavs');
     final productsData = Provider.of<Products>(context);
     final products =  showFavs ?  productsData.favoriteItems : productsData.items;
 
