@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:shop/models/product.dart';
+import 'package:shop/providers/products.dart';
 
 
 class EditProductScreen extends StatefulWidget {
@@ -10,6 +13,9 @@ class EditProductScreen extends StatefulWidget {
 }
 
 class _EditProductScreenState extends State<EditProductScreen> {
+
+  var _isInit = true;
+
   final _priceFocusNode = FocusNode();
   final _descriptionFocusNode = FocusNode();
   final _imageUrlController =
@@ -24,6 +30,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     _imageUrlFocusNode.addListener(_updateImageUrl);
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    //Treta para pegar os parametros da rota
+    //Esse código não funciona de maneira decente no initState
+    if(_isInit){
+      final productId = ModalRoute.of(context).settings.arguments as String;
+      
+    }
+    _isInit = false;
+
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -36,6 +57,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _updateImageUrl(){
+
+    //Tem que validar a imagem aqui mas estou com preguiça
+
     if(_imageUrlFocusNode.hasFocus){
       setState(() {
         //Aqui não faz nada. Apenas caqueio para forçar o build do widget
@@ -48,7 +72,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (!isValid) { return; }
     
     _form.currentState.save();
-    print(_editedProduct.title);
+    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    Navigator.of(context).pop();
+
   }
 
   @override
@@ -107,6 +133,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     id: null,
                   );
                 },
+                validator: (value){
+                  if(value.isEmpty) { return 'Please enter a price'; }
+
+                  if(double.tryParse(value) == null) { return 'Please enter a valid number'; }
+
+                  if(double.parse(value) <=0) { return 'The price must be greater than zero.'; }
+
+                  return null;
+                },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Description'),
@@ -121,6 +156,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     imageUrl: _editedProduct.imageUrl,
                     id: null,
                   );
+                },
+                validator: (value){
+                  if(value.isEmpty){ return 'Please enter a description'; }
+
+                  if(value.length < 10){ return 'Should be at least 10 characteres long'; }
+
+                  return null;
                 },
               ),
               Row(
@@ -148,14 +190,23 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       focusNode: _imageUrlFocusNode,
                       onFieldSubmitted: (_) => _saveForm(),
                       onSaved: (value){
-                  _editedProduct = Product(
-                    title: _editedProduct.title,
-                    price: _editedProduct.price,
-                    description: _editedProduct.description,
-                    imageUrl: value,
-                    id: null,
-                  );
-                },
+                          _editedProduct = Product(
+                            title: _editedProduct.title,
+                            price: _editedProduct.price,
+                            description: _editedProduct.description,
+                            imageUrl: value,
+                            id: null,
+                          );
+                        },
+                        validator: (value){
+                          if (value.isEmpty) { return 'Please enter a image URL.'; }
+
+                          if(!value.startsWith('http') && !value.startsWith('https')) { return 'Please entar a valid URL.'; }
+
+                          if(!value.endsWith('.png') && !value.endsWith('.jpg') && !value.endsWith('.jpeg') ) { return 'Please entar a valid URL.'; }
+
+                          return null;
+                        },
                     ),
                   ),
                 ],

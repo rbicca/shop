@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shop/models/product.dart';
 
 class Products with ChangeNotifier {
-
   List<Product> _items = [
     Product(
       id: 'p1',
@@ -44,20 +43,27 @@ class Products with ChangeNotifier {
     //if(_showFavoritesOnly){
     //  return _items.where((p) => p.isFavorite).toList();
     //} else {
-      return [..._items];
+    return [..._items];
     //}
   }
 
-  List<Product> get favoriteItems{
+  List<Product> get favoriteItems {
     return _items.where((p) => p.isFavorite == true).toList();
   }
 
-  Product findById(String id){
+  Product findById(String id) {
     return _items.firstWhere((prod) => prod.id == id);
   }
 
-  void addProduct(Object value){
-    _items.add(value);
+  void addProduct(Product value) {
+    final newProduct = Product(
+        title: value.title,
+        description: value.description,
+        price: value.price,
+        imageUrl: value.imageUrl,
+        id: DateTime.now().toString()
+    );
+    _items.add(newProduct);
     notifyListeners();
   }
 
@@ -70,6 +76,5 @@ class Products with ChangeNotifier {
   //   _showFavoritesOnly = false;
   //   notifyListeners();
   // }
-
 
 }
