@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -67,6 +69,9 @@ class Products with ChangeNotifier {
       //print(json.decode(response.body));
       final data = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
+
+      if(data == null) { return; }
+
       data.forEach((key, value){
         loadedProducts.add(Product(
           id: key,
@@ -139,7 +144,7 @@ class Products with ChangeNotifier {
     }
   }
 
-  void deleteProduct(String id) {
+  Future<void> deleteProduct(String id) async {
     final url = 'https://sktodo.firebaseio.com/products/$id.json';
 
     //Exemplo de delete otimista
@@ -147,20 +152,17 @@ class Products with ChangeNotifier {
     var existingProduct = _items[existingProductIndex];
     _items.removeAt(existingProductIndex);
     notifyListeners();
-    http.delete(url)
-    .then((response){
-      print(response.statusCode);
-      if(response.statusCode >= 400){
-        
-      }
-      existingProduct = null;
-    })
-    .catchError((_){
+
+    final response = await http.delete(url);
+    print(response.statusCode);
+    if(response.statusCode >= 400){
       _items.insert(existingProductIndex, existingProduct);
       notifyListeners();
-    });
-
+      throw HttpException('Could not delete product.');
+    }
+    existingProduct = null;
   }
+  
   // void showFavoritesOnly(){
   //   _showFavoritesOnly = true;
   //   notifyListeners();
