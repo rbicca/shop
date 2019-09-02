@@ -19,13 +19,13 @@ class Product with ChangeNotifier {
       @required this.imageUrl,
       this.isFavorite = false});
 
-  Future<void> toogleFavoriteStatus() async {
+  Future<void> toogleFavoriteStatus(String token) async {
     final oldStatus = isFavorite;
 
     isFavorite = !isFavorite;
     notifyListeners();
 
-    final url = 'https://sktodo.firebaseio.com/products/$id.json';
+    final url = 'https://sktodo.firebaseio.com/products/$id.json?auth=$token';
 
     try {
       //Lembrando que patch não retorno erra de requisição direto. Temos que ler da response

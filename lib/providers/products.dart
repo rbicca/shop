@@ -44,6 +44,11 @@ class Products with ChangeNotifier {
 
   //var _showFavoritesOnly = false;
 
+  var _authToken = '';
+  set authToken(String value){
+    _authToken = value;
+  }
+
   List<Product> get items {
     //if(_showFavoritesOnly){
     //  return _items.where((p) => p.isFavorite).toList();
@@ -62,7 +67,7 @@ class Products with ChangeNotifier {
 
 
   Future<void> fetchAndSetProducts() async {
-    const url = 'https://sktodo.firebaseio.com/products.json';
+    final url = 'https://sktodo.firebaseio.com/products.json?auth=$_authToken';
 
     try {
       final response = await http.get(url);
@@ -91,7 +96,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product value) async {
-    final url = 'https://sktodo.firebaseio.com/products.json';
+    final url = 'https://sktodo.firebaseio.com/products.json?auth=$_authToken';
 
     try {
       final response = await http.post(
@@ -128,7 +133,7 @@ class Products with ChangeNotifier {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
 
-      final url = 'https://sktodo.firebaseio.com/products/$id.json';
+      final url = 'https://sktodo.firebaseio.com/products/$id.json?auth=$_authToken';
 
       http.patch(url, body: json.encode({
         'title': newProduct.title,
@@ -145,7 +150,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
-    final url = 'https://sktodo.firebaseio.com/products/$id.json';
+    final url = 'https://sktodo.firebaseio.com/products/$id.json?auth=$_authToken';
 
     //Exemplo de delete otimista
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
