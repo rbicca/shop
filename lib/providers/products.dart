@@ -45,8 +45,14 @@ class Products with ChangeNotifier {
   //var _showFavoritesOnly = false;
 
   var _authToken = '';
+  var _userId = '';
+
   set authToken(String value){
     _authToken = value;
+  }
+
+  set userId(String value){
+    _userId = value;
   }
 
   List<Product> get items {
@@ -66,16 +72,23 @@ class Products with ChangeNotifier {
   }
 
 
-  Future<void> fetchAndSetProducts() async {
-    final url = 'https://sktodo.firebaseio.com/products.json?auth=$_authToken';
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    print('O parametr é' + filterByUser.toString());
+    final filterString = filterByUser ? 'orderBy="creatorId"&equalTo="$_userId"': '';
+    var url = 'https://sktodo.firebaseio.com/products.json?auth=$_authToken&$filterString';
+    print('O filtro é $filterString');
 
     try {
       final response = await http.get(url);
-      //print(json.decode(response.body));
       final data = json.decode(response.body) as Map<String, dynamic>;
+      if(data == null) { return; }
+
+      url = 'https://sktodo.firebaseio.com/userFavorites/$_userId.json?auth=$_authToken';
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
+
       final List<Product> loadedProducts = [];
 
-      if(data == null) { return; }
 
       data.forEach((key, value){
         loadedProducts.add(Product(
@@ -83,7 +96,7 @@ class Products with ChangeNotifier {
           title: value['title'],
           description: value['description'],
           price: value['price'],
-          isFavorite: value['isFavorite'],
+          isFavorite:  favoriteData == null ? false : favoriteData[key] ?? false,
           imageUrl: value['imageUrl'],
         ));
       });
@@ -106,7 +119,7 @@ class Products with ChangeNotifier {
           'description': value.description,
           'imageUrl': value.imageUrl,
           'price': value.price,
-          'isFavorite': value.isFavorite,
+          'creatorId': _userId,
         }),
       );
 

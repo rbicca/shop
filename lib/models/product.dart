@@ -19,20 +19,20 @@ class Product with ChangeNotifier {
       @required this.imageUrl,
       this.isFavorite = false});
 
-  Future<void> toogleFavoriteStatus(String token) async {
+  Future<void> toogleFavoriteStatus(String token, String userId) async {
     final oldStatus = isFavorite;
 
     isFavorite = !isFavorite;
     notifyListeners();
 
-    final url = 'https://sktodo.firebaseio.com/products/$id.json?auth=$token';
+    final url = 'https://sktodo.firebaseio.com/userFavorites/$userId/$id.json?auth=$token';
 
     try {
       //Lembrando que patch não retorno erra de requisição direto. Temos que ler da response
-      final response = await http.patch(url,
-          body: json.encode({
-            'isFavorite': isFavorite,
-          }));
+      final response = await http.put(url,
+          body: json.encode(
+            isFavorite,
+          ));
       if (response.statusCode >= 400) {
         isFavorite = oldStatus;
         notifyListeners();

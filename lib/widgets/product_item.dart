@@ -37,7 +37,7 @@ class ProductItem extends StatelessWidget {
             builder: (ctx, product, child) => IconButton(
               icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),
-              onPressed: () => product.toogleFavoriteStatus(authData.token),
+              onPressed: () => product.toogleFavoriteStatus(authData.token, authData.userId),
               color: Theme.of(context).accentColor,
             ),
           ),
